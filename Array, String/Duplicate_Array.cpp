@@ -1,0 +1,42 @@
+#include<iostream>
+using namespace std;
+
+int main()
+{
+	int* A;
+	int n, size;
+	int length = 0;
+	int count;
+
+	cout << "Enter the number of elements in the array: ";
+	cin >> size;
+
+	A = new int[size];
+
+	cout << "Enter the elements: ";
+	for (int i = 0; i < size; i++) {
+		cin >> n;
+		A[length] = n;
+		length++;
+	}
+
+	for (int i = 0; i < size - 1; i++) {
+		count = 1;
+		if (A[i] != -1) {
+			for (int j = i + 1; j < size; j++) {
+				if (A[i] == A[j]) {
+					count++;
+					A[j] = -1;
+				}
+			}
+			if (count > 1) {
+				cout << "Element " << A[i] << " is duplicate with count " << count << endl;
+			}
+		}
+	}
+
+	delete[] A;
+
+	return 0;
+}
+
