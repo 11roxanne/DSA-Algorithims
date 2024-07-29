@@ -1,202 +1,202 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
+#include <queue>
+using namespace std;
 
-// Structure to represent a node in the binary tree
-struct Node
-{
+struct Node {
     int data;
-    struct Node *left;
-    struct Node *right;
+    Node* left;
+    Node* right;
+
+    Node(int val) {
+        data = val;
+        left = NULL;
+        right = NULL;
+    }
 };
 
-// Function to create a new node with the given data
-struct Node *createNode(int data)
-{
-    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
-    newNode->data = data;
-    newNode->left = NULL;
-    newNode->right = NULL;
-    return newNode;
-}
+Node* insertNode(Node* root, int val) {
+    if (root == NULL) {
+        return new Node(val);
+    }
 
-// Function to insert a node in the binary tree
-struct Node *insertNode(struct Node *root, int data)
-{
-    if (root == NULL)
-    {
-        root = createNode(data);
+    if (val < root->data) {
+        root->left = insertNode(root->left, val);
+    } else {
+        root->right = insertNode(root->right, val);
     }
-    else if (data < root->data)
-    {
-        root->left = insertNode(root->left, data);
-    }
-    else if (data > root->data)
-    {
-        root->right = insertNode(root->right, data);
-    }
+
     return root;
 }
 
-// Function to perform recursive inorder traversal of the binary tree
-void inorderRecursive(struct Node *root)
-{
-    if (root != NULL)
-    {
-        inorderRecursive(root->left);
-        printf("%d ", root->data);
-        inorderRecursive(root->right);
+void preorderTraversal(Node* root) {
+    if (root == NULL) {
+        return;
     }
+
+    cout << root->data << " ";
+    preorderTraversal(root->left);
+    preorderTraversal(root->right);
 }
 
-// Function to perform non-recursive inorder traversal of the binary tree
-void inorderNonRecursive(struct Node *root)
-{
-    struct Node *stack[100];
-    int top = -1;
-    while (1)
-    {
-        while (root != NULL)
-        {
-            stack[++top] = root;
-            root = root->left;
-        }
-        if (top != -1)
-        {
-            root = stack[top--];
-            printf("%d ", root->data);
-            root = root->right;
-        }
-        else
-        {
-            break;
-        }
+void inorderTraversal(Node* root) {
+    if (root == NULL) {
+        return;
     }
+
+    inorderTraversal(root->left);
+    cout << root->data << " ";
+    inorderTraversal(root->right);
 }
 
-// Function to perform recursive preorder traversal of the binary tree
-void preorderRecursive(struct Node *root)
-{
-    if (root != NULL)
-    {
-        printf("%d ", root->data);
-        preorderRecursive(root->left);
-        preorderRecursive(root->right);
+void postorderTraversal(Node* root) {
+    if (root == NULL) {
+        return;
     }
+
+    postorderTraversal(root->left);
+    postorderTraversal(root->right);
+    cout << root->data << " ";
 }
 
-// Function to perform non-recursive preorder traversal of the binary tree
-void preorderNonRecursive(struct Node *root)
-{
-    struct Node *stack[100];
-    int top = -1;
-    stack[++top] = root;
-    while (top != -1)
-    {
-        root = stack[top--];
-        printf("%d ", root->data);
-        if (root->right != NULL)
-        {
-            stack[++top] = root->right;
+void levelorderTraversal(Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    queue<Node*> q;
+    q.push(root);
+
+    while (!q.empty()) {
+        Node* curr = q.front();
+        cout << curr->data << " ";
+        q.pop();
+
+        if (curr->left != NULL) {
+            q.push(curr->left);
         }
-        if (root->left != NULL)
-        {
-            stack[++top] = root->left;
+
+        if (curr->right != NULL) {
+            q.push(curr->right);
         }
     }
 }
 
-// Function to perform recursive postorder traversal of the binary tree
-void postorderRecursive(struct Node *root)
-{
-    if (root != NULL)
-    {
-        postorderRecursive(root->left);
-        postorderRecursive(root->right);
-        printf("%d ", root->data);
+Node* deleteNode(Node* root, int val) {
+    if (root == NULL) {
+        return root;
+    }
+
+    if (val < root->data) {
+        root->left = deleteNode(root->left, val);
+    } else if (val > root->data) {
+        root->right = deleteNode(root->right, val);
+    } else {
+        if (root->left == NULL) {
+            Node* temp = root->right;
+            delete root;
+            return temp;
+        } else if (root->right == NULL) {
+            Node* temp = root->left;
+            delete root;
+            return temp;
+        }
+
+        root->data = minValue(root->right);
+        root->right = deleteNode(root->right, root->data);
+    }
+
+    return root;
+}
+
+int minValue(Node* root) {
+    int minv = root->data;
+    while (root->left != NULL) {
+        minv = root->left->data;
+        root = root->left;
+    }
+    return minv;
+}
+
+bool searchNode(Node* root, int val) {
+    if (root == NULL) {
+        return false;
+    }
+
+    if (root->data == val) {
+        return true;
+    }
+
+    if (val < root->data) {
+        return searchNode(root->left, val);
+    } else {
+        return searchNode(root->right, val);
     }
 }
 
-// Function to perform non-recursive postorder traversal of the binary tree
-void postorderNonRecursive(struct Node *root)
-{
-    struct Node *stack1[100];
-    struct Node *stack2[100];
-    int top1 = -1;
-    int top2 = -1;
-    stack1[++top1] = root;
-    while (top1 != -1)
-    {
-        root = stack1[top1--];
-        stack2[++top2] = root;
-        if (root->left != NULL)
-        {
-            stack1[++top1] = root->left;
-        }
-        if (root->right != NULL)
-        {
-            stack1[++top1] = root->right;
-        }
-    }
-    while (top2 != -1)
-    {
-        root = stack2[top2--];
-        printf("%d ", root->data);
-    }
-}
-int main()
-{
-    struct Node *root = NULL;
-    int choice, data;
-    while (1)
-    {
-        printf("\n1. Insert node");
-        printf("\n2. Recursive inorder traversal");
-        printf("\n3. Non-recursive inorder traversal");
-        printf("\n4. Recursive preorder traversal");
-        printf("\n5. Non-recursive preorder traversal");
-        printf("\n6. Recursive postorder traversal");
-        printf("\n7. Non-recursive postorder traversal");
-        printf("\n8. Exit");
-        printf("\nEnter your choice: ");
-        scanf("%d", &choice);
-        switch (choice)
-        {
-        case 1:
-            printf("Enter data to be inserted: ");
-            scanf("%d", &data);
-            root = insertNode(root, data);
-            break;
-        case 2:
-            printf("\nInorder traversal (recursive): ");
-            inorderRecursive(root);
-            break;
-        case 3:
-            printf("\nInorder traversal (non-recursive): ");
-            inorderNonRecursive(root);
-            break;
-        case 4:
-            printf("\nPreorder traversal (recursive): ");
-            preorderRecursive(root);
-            break;
-        case 5:
-            printf("\nPreorder traversal (non-recursive): ");
-            preorderNonRecursive(root);
-            break;
-        case 6:
-            printf("\nPostorder traversal (recursive): ");
-            postorderRecursive(root);
-            break;
-        case 7:
-            printf("\nPostorder traversal (non-recursive): ");
-            postorderNonRecursive(root);
-            break;
-        case 8:
-            printf("\nExiting program");
-            exit(0);
-        default:
-            printf("\nInvalid choice. Please try again");
+int main() {
+    Node* root = NULL;
+    int choice, value;
+
+    while (true) {
+        cout << "\nBinary Tree Operations:\n";
+        cout << "1. Insert\n";
+        cout << "2. Delete\n";
+        cout << "3. Preorder Traversal\n";
+        cout << "4. Inorder Traversal\n";
+        cout << "5. Postorder Traversal\n";
+        cout << "6. Level Order Traversal\n";
+        cout << "7. Search\n";
+        cout << "8. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter the value to insert: ";
+                cin >> value;
+                root = insertNode(root, value);
+                break;
+            case 2:
+                cout << "Enter the value to delete: ";
+                cin >> value;
+                root = deleteNode(root, value);
+                break;
+            case 3:
+                cout << "Preorder Traversal: ";
+                preorderTraversal(root);
+                cout << endl;
+                break;
+            case 4:
+                cout << "Inorder Traversal: ";
+                inorderTraversal(root);
+                cout << endl;
+                break;
+            case 5:
+                cout << "Postorder Traversal: ";
+                postorderTraversal(root);
+                cout << endl;
+                break;
+            case 6:
+                cout << "Level Order Traversal: ";
+                levelorderTraversal(root);
+                cout << endl;
+                break;
+            case 7:
+                cout << "Enter the value to search: ";
+                cin >> value;
+                if (searchNode(root, value)) {
+                    cout << "Value found in the binary tree.\n";
+                } else {
+                    cout << "Value not found in the binary tree.\n";
+                }
+                break;
+            case 8:
+                cout << "Exiting...\n";
+                return 0;
+            default:
+                cout << "Invalid choice. Please try again.\n";
         }
     }
+
     return 0;
 }
-
