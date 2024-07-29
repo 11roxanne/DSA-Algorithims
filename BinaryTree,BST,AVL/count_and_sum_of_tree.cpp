@@ -36,6 +36,16 @@ int countNodes(struct node* root) {
 	return 1 + countNodes(root->left) + countNodes(root->right);
 }
 
+int sumNodes(struct node* root) {
+	if (root == NULL) {
+		return 0;
+	}
+	leftsum=sumNodes(root->left);
+	rightsum=sumNodes(root->right);
+	return leftsum+rightsum+root->data;
+}
+
+
 int main() {
 	struct node* root = NULL;
 	root = insert(root, 6);
